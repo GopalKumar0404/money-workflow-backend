@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: mysql://root:UwI6lBBfJkPNwm2FltYS@containers-us-west-72.railway.app:7951/railway
+    username: root
+    password: UwI6lBBfJkPNwm2FltYS
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+      
+server:
+  port: ${ENV:9091}
