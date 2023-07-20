@@ -1,9 +1,14 @@
 package com.gopal.MoneyWorkflow.Services.impl;
 
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.gopal.MoneyWorkflow.Exceptions.RequestBodyNotSupported;
@@ -13,6 +18,7 @@ import com.gopal.MoneyWorkflow.Repositories.UserRepo;
 import com.gopal.MoneyWorkflow.Services.TransactionDetailService;
 import com.gopal.MoneyWorkflow.entities.TransactionDetail;
 import com.gopal.MoneyWorkflow.entities.User;
+import com.gopal.MoneyWorkflow.utility.ExcelHelper;
 
 @Service
 public class TransactionDetailServiceImplementation implements TransactionDetailService {
@@ -21,7 +27,11 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 	private TransactionDetailRepo transactionRepo;
 	@Autowired
 	private UserRepo userRepo;
+	@Autowired
+	private ExcelHelper excel;
 
+	SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	
 	@Override
 	public TransactionDetail createTransactionDetail(TransactionDetail transactionDetail) {
 		// TODO Auto-generated method stub
@@ -49,9 +59,11 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 	}
 
 	@Override
-	public List<TransactionDetail> getAllTransactionDetail() {
+	public List<TransactionDetail> getAllTransactionDetail(Integer pageNumber, Integer pageSize, String sortBy,String sortByDirection) {
 		// TODO Auto-generated method stub
-		return this.transactionRepo.findAll();
+		Pageable p = PageRequest.of(pageNumber, pageSize, sortByDirection.equalsIgnoreCase("ASC")?Sort.by(sortBy).ascending():Sort.by(sortBy).descending());
+		
+		return this.transactionRepo.findAll(p).getContent();
 	}
 
 	@Override
@@ -66,8 +78,30 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 //	@Override
 	public TransactionDetail updateTransaction(TransactionDetail transactionDetail) {
 		// TODO Auto-generated method stub
-		transactionDetail.setTransactionDate(new Date());
+		transactionDetail.setTransactionDate(sdf.format(new Date()));
 		return this.transactionRepo.save(transactionDetail);
+	}
+	
+	@Override
+	public byte[] createExcelwithUserId(Long userId) {
+		
+		System.out.println("userId : "+ userId);
+		byte[] excelData = null;
+		
+		
+		
+		List<TransactionDetail> allTransactionDetailOfUser = getAllTransactionDetailOfUser(userId);
+		
+        System.out.println(allTransactionDetailOfUser.size());
+		try {
+		
+			excelData = excel.appendInExcel(allTransactionDetailOfUser);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return excelData;
 	}
 
 }

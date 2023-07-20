@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,14 +24,14 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String username;
-	private long phoneNo;
-	private Date lastTransactionDate;
-	private long lastTransactionAmount;
+	private Long phoneNo;
+	private String lastTransactionDate;
+	private Long lastTransactionAmount;
 	private String typeOfTransaction;
-	private long totalAmount;
+	private Long totalAmount;
 	private String description;
 	
-	@Transient
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<TransactionDetail> transactionDetail = new ArrayList<>();
 }

@@ -1,10 +1,13 @@
 package com.gopal.MoneyWorkflow.Services.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.gopal.MoneyWorkflow.Exceptions.EntityValidationError;
@@ -24,18 +27,27 @@ public class UserServiceImplementaion implements UserService {
 	@Autowired
 	private TransactionDetailService transactionService;
 
-
+	SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
-	@Autowired
-	private ModelMapper modelMapper;
+	
 
 	@Override
 	public User createUser(User user) {
 		// TODO Auto-generated method stub
 
-		user.setLastTransactionDate(new Date());
+		user.setLastTransactionDate(sdf.format(new Date()));
 		if(user.getId()!=null) {
 			throw new RequestBodyNotSupported("Request Body with Id not supported.");
+		}
+		
+		if(user.getTypeOfTransaction().equalsIgnoreCase("Debit")) {
+			user.setTotalAmount(0L - user.getLastTransactionAmount());
+		}
+		else if(user.getTypeOfTransaction().equalsIgnoreCase("Credit")) {
+			user.setTotalAmount(0L + user.getLastTransactionAmount());
+		}
+		else {
+			throw new EntityValidationError("Type of Transaction is not Valid : "+user.getTypeOfTransaction());
 		}
 		User savedUser = this.userRepo.save(user);
 
@@ -52,9 +64,11 @@ public class UserServiceImplementaion implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUser() {
+	public List<User> getAllUser(Integer pageNumber, Integer pageSize, String sortBy,String sortByDirection) {
 		// TODO Auto-generated method stub
-		return this.userRepo.findAll();
+		Sort sort = sortByDirection.equalsIgnoreCase("ASC")?Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
+		Pageable p = PageRequest.of(pageNumber, 10, sort);
+		return this.userRepo.findAll(p).getContent();
 	}
 
 	@Override
@@ -67,25 +81,28 @@ public class UserServiceImplementaion implements UserService {
 	}
 
 	@Override
-	public User updateUser(User user) {
-		User tempUser = getUserById(user.getId());
-		System.out.println(tempUser.getTotalAmount());
-		user.setTotalAmount(tempUser.getTotalAmount());
+	public User updateUser(Long userId, User user) {
+		User tempUser = getUserById(userId);
+		tempUser.setLastTransactionAmount(user.getLastTransactionAmount());
+		tempUser.setDescription(user.getDescription());
+		
 		if(user.getTypeOfTransaction().equalsIgnoreCase("Credit")) {
-			user.setTotalAmount(user.getTotalAmount()+user.getLastTransactionAmount());
+			tempUser.setTotalAmount(tempUser.getTotalAmount()+tempUser.getLastTransactionAmount());
+			tempUser.setTypeOfTransaction("Credit");
 		}
 		else if(user.getTypeOfTransaction().equalsIgnoreCase("Debit")) {
-			user.setTotalAmount(user.getTotalAmount()- user.getLastTransactionAmount());
+			tempUser.setTotalAmount(tempUser.getTotalAmount()- tempUser.getLastTransactionAmount());
+			tempUser.setTypeOfTransaction("Debit");
 		}
 		else {
 			 throw new EntityValidationError("Type of Transaction is not Valid : "+user.getTypeOfTransaction());
 		}
-		user.setLastTransactionDate(new Date());
+		tempUser.setLastTransactionDate(sdf.format(new Date()));
 		
 
-		this.transactionService.createTransactionDetail(UserToTransactionDetail(user));
+		this.transactionService.createTransactionDetail(UserToTransactionDetail(tempUser));
 		
-		return this.userRepo.save(user);
+		return this.userRepo.save(tempUser);
 	}
 
 	public TransactionDetail UserToTransactionDetail(User user) {
@@ -118,4 +135,6 @@ public class UserServiceImplementaion implements UserService {
 //		
 		return transactionDetail;
 	}
+
+	
 }

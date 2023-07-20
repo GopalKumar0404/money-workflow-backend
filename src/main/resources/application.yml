@@ -1,5 +1,5 @@
 server:
-  port: 9091
+  port: ${PORT:9091}
   
 
 spring:
@@ -13,3 +13,6 @@ spring:
       ddl-auto: update
       
     show-sql: true
+    
+
+    
