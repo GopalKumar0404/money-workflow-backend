@@ -2,6 +2,7 @@ package com.gopal.MoneyWorkflow.Repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +14,6 @@ import com.gopal.MoneyWorkflow.entities.User;
 public interface TransactionDetailRepo extends JpaRepository<TransactionDetail, Long> {
 	
 	List<TransactionDetail> findByUser(User user);
+	List<TransactionDetail> findByUser(User user,Pageable p);
 
 }

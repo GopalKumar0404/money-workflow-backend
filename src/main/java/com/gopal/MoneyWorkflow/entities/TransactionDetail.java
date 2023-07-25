@@ -17,7 +17,7 @@ import lombok.Data;
 public class TransactionDetail {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long transactionId;
 	private String username;
 	private String transactionDate;

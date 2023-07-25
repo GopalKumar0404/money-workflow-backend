@@ -12,6 +12,7 @@ public interface UserService {
 	List<User> getAllUser(Integer pageNumber, Integer pageSize, String sortBy,String sortByDirection);
 	User deleteUser(Long userId);
 	User updateUser(Long userId, User user);
+	void createEntryOfUser(User[] user);
 	
 
 }

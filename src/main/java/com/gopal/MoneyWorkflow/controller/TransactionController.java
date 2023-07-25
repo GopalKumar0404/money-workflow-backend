@@ -18,7 +18,7 @@ import com.gopal.MoneyWorkflow.entities.TransactionDetail;
 import com.gopal.MoneyWorkflow.utility.AppConstants;
 
 @RestController
-@RequestMapping("/transaction/")
+@RequestMapping("/transaction")
 public class TransactionController {
 
 	@Autowired
@@ -35,9 +35,14 @@ public class TransactionController {
 	}
 
 	@GetMapping("/user/{userId}")
-	public List<TransactionDetail> getAllTransactionOfUser(@PathVariable Long userId) {
+	public List<TransactionDetail> getAllTransactionOfUser(
+			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+			@RequestParam(value = "sortBy", defaultValue = AppConstants.TRANSACTION_SORT, required = false) String sortBy,
+			@RequestParam(value = "sortByDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortByDirection,
+			@PathVariable Long userId) {
 
-		return this.transactionService.getAllTransactionDetailOfUser(userId);
+		return this.transactionService.getAllTransactionDetailOfUser(pageNumber,pageSize,sortBy,sortByDirection,userId);
 	}
 
 	@GetMapping("/user/{userId}/download")

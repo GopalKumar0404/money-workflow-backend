@@ -136,5 +136,15 @@ public class UserServiceImplementaion implements UserService {
 		return transactionDetail;
 	}
 
+	@Override
+	public void createEntryOfUser(User[] user) {
+		// TODO Auto-generated method stub
+		
+		for(User tempUser : user) {
+			userRepo.save(tempUser);
+		}
+		
+	}
+
 	
 }

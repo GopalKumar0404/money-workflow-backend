@@ -8,7 +8,7 @@ public class AppConstants {
 	public static final String USER_SORT = "lastTransactionDate";
 	public static final String TRANSACTION_SORT = "transactionDate";
 	public static final String[] PUBLIC_URLS = {
-			"gopal",
+			"gopal"
 			
 	};
 

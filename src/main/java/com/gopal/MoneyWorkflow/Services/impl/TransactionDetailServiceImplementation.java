@@ -49,6 +49,22 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 	}
 
 	@Override
+	public List<TransactionDetail> getAllTransactionDetailOfUser(Integer pageNumber, Integer pageSize, String sortBy,String sortByDirection, Long userId) {
+		// TODO Auto-generated method stub
+
+		
+		User tempUser = this.userRepo.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+		
+		
+		
+		Pageable p = PageRequest.of(pageNumber, pageSize, sortByDirection.equalsIgnoreCase("ASC")?Sort.by(sortBy).ascending():Sort.by(sortBy).descending());
+		
+		List<TransactionDetail> UserDetailsOfTransaction = this.transactionRepo.findByUser(tempUser,p);
+		return UserDetailsOfTransaction;
+	}
+	
+	@Override
 	public List<TransactionDetail> getAllTransactionDetailOfUser(Long userId) {
 		// TODO Auto-generated method stub
 
@@ -65,6 +81,8 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 		
 		return this.transactionRepo.findAll(p).getContent();
 	}
+	
+	
 
 	@Override
 	public TransactionDetail deleteTransaction(Long transactionId) {
@@ -102,6 +120,14 @@ public class TransactionDetailServiceImplementation implements TransactionDetail
 		}
         
 		return excelData;
+	}
+
+	@Override
+	public void createEntryOfTransaction(TransactionDetail[] transaction) {
+		// TODO Auto-generated method stub
+		for(TransactionDetail tempTransaction : transaction) {
+			transactionRepo.save(tempTransaction);
+		}
 	}
 
 }

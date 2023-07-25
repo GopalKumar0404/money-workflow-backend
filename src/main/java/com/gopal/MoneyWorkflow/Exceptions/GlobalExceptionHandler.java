@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.gopal.MoneyWorkflow.payload.ApiResponse;
 
@@ -97,5 +98,16 @@ public class GlobalExceptionHandler {
 		ApiResponse apiResponse = new ApiResponse(message,false);
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.NOT_ACCEPTABLE);
 	}
+	
+	
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ApiResponse> methodArgumentTypeMismatchException (MethodArgumentTypeMismatchException ex){
+		String message = ex.getMessage();
+		if(message == null)
+			message = "something gone wrong Mehtod Argument not matched";
+		ApiResponse apiResponse = new ApiResponse(message,false);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.NOT_ACCEPTABLE);
+	}
+	
 	
 }
